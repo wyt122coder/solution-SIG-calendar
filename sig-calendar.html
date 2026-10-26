@@ -71,6 +71,33 @@ const MEETING_DETAILS = {
     meetingId: '99121984（welink客户端接入需输会议密码：203658）',
     link: 'https://app.huawei.com/wmeeting/join/99121984/mTY15AoqX45tTU8Ew0fQtAAcMYeXakeht',
     agenda: ['议题一：Agent Solution仓1030版本发布宣讲', '议题二：南网电力行业SIG成立申请', '议题三：AI 原生钢厂建设思路及冶金SIG筹建申请', '议题四：开放讨论']
+  },
+  '2026-09': {
+    day: 30,
+    title: 'OpenJiuwen Agent Solution 九月SIG会议',
+    status: '已结束',
+    platform: 'welink线上',
+    meetingId: '94182955（welink客户端接入需输会议密码：704281）',
+    link: 'https://app.huawei.com/wmeeting/join/94182955/wWlUutXxsOcuNPxFTgGFJ1nS31mHNWUwh',
+    agenda: ['议题一：Agent Solution仓930版本发布宣讲', '议题二：openJiuwen开发范式宣讲', '议题三：开放讨论']
+  },
+  '2026-08': {
+    day: 26,
+    title: 'OpenJiuwen Agent Solution 八月SIG会议',
+    status: '已结束',
+    platform: 'welink线上',
+    meetingId: '96825204（welink客户端接入需输会议密码：881330）',
+    link: 'https://app.huawei.com/wmeeting/join/96825204/f2CRXVqp6Y86Ij16eP5I0hsBTdEsrrgXt',
+    agenda: ['议题一：Agent Solution仓830版本发布评审', '议题二：智能体架构H2规划', '议题三：研讨议题：行业SIG筹备讨论', '议题四：开放讨论']
+  },
+  '2026-07': {
+    day: 22,
+    title: 'OpenJiuwen Agent Solution 七月SIG会议',
+    status: '已结束',
+    platform: '线下会议（练秋湖B4-3-18R）& welink线上',
+    meetingId: '95272456（welink客户端接入需输会议密码：693961）',
+    link: 'https://app.huawei.com/wmeeting/join/95272456/KbEGsZWVHHICwbWSulH5BZz0M5EyXAzX9',
+    agenda: ['议题一：Openjiuwen的平台能力规划和进展宣讲', '议题二：社区管理与方向性决策（SIG运作机制宣讲）', '议题三：金融实战案例分享', '议题四：开放讨论']
   }
 };
 const MONTH_NAMES = ['一','二','三','四','五','六','七','八','九','十','十一','十二'];
@@ -81,13 +108,13 @@ const pad = n => String(n).padStart(2,'0');
 const escapeHTML = value => String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function lastWednesday(y,m){const last=new Date(Date.UTC(y,m+1,0));return last.getUTCDate()-(last.getUTCDay()-3+7)%7;}
 function getMeeting(y,m){
-  const key=`${y}-${pad(m+1)}`, day=lastWednesday(y,m),date=`${key}-${pad(day)}`;
-  // September spelling follows the supplied copy verbatim.
-  const prefix=y===2026&&m===8?'penJiuwen':'openJiuwen';
-  return {key,year:y,month:m,day,date,title:`${prefix} Agent Solution ${MONTH_NAMES[m]}月SIG会议`,status:date<SNAPSHOT_DAY?'已结束':'待开始',...MEETING_DETAILS[key]};
+  const key=`${y}-${pad(m+1)}`, confirmed=MEETING_DETAILS[key]||{};
+  // Confirmed historical dates take precedence over the recurring schedule.
+  const day=confirmed.day??lastWednesday(y,m),date=`${key}-${pad(day)}`;
+  return {key,year:y,month:m,day,date,title:`openJiuwen Agent Solution ${MONTH_NAMES[m]}月SIG会议`,status:date<SNAPSHOT_DAY?'已结束':'待开始',...confirmed};
 }
 function meetings(){
-  if(selectedDay!==null)return selectedDay===lastWednesday(year,month)?[getMeeting(year,month)]:[];
+  if(selectedDay!==null)return selectedDay===getMeeting(year,month).day?[getMeeting(year,month)]:[];
   return Array.from({length:range},(_,i)=>{const d=new Date(Date.UTC(year,month-i,1));return getMeeting(d.getUTCFullYear(),d.getUTCMonth());});
 }
 function renderCalendar(){
@@ -96,7 +123,7 @@ function renderCalendar(){
   let html=['日','一','二','三','四','五','六'].map(d=>`<div class="calendarWeekday_cbRA">${d}</div>`).join('');
   for(let i=0;i<42;i++){
     const d=new Date(Date.UTC(year,month,1-offset+i));const day=d.getUTCDate(),inside=d.getUTCMonth()===month;
-    const meeting=inside&&day===lastWednesday(year,month),date=`${year}-${pad(month+1)}-${pad(day)}`;
+    const meeting=inside&&day===getMeeting(year,month).day,date=`${year}-${pad(month+1)}-${pad(day)}`;
     const classes=['calendarDay_XQwx',!inside?'calendarDayOtherMonth_Z7ER':'',inside&&!meeting&&date<SNAPSHOT_DAY?'calendarDayPast_DjQy':'',meeting?'sig-meeting calendarDayToday_TNxy':'',inside&&day===selectedDay?(meeting?'calendarDaySelected_bq2U':'sig-neutral-selected'):''].filter(Boolean).join(' ');
     html+=`<button type="button" class="${classes}" ${inside?`data-day="${day}"`:'disabled tabindex="-1"'} aria-label="${d.getUTCFullYear()}年${d.getUTCMonth()+1}月${day}日${meeting?'，Solution SIG会议':''}" aria-pressed="${inside&&day===selectedDay}"><span class="calendarDayNumber_s8Km">${day}</span>${meeting?'<span class="calendarDayEvents_cSXP"><img class="calendarDayEventIcon_Fra5" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDQ4IDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik00IDEwQzQgOC44OTU0MyA0Ljg5NTQzIDggNiA4SDM0QzM1LjEwNDYgOCAzNiA4Ljg5NTQzIDM2IDEwVjE5TDQ0IDEzVjM2TDM2IDMwVjM4QzM2IDM5LjEwNDYgMzUuMTA0NiA0MCAzNCA0MEg2QzQuODk1NDMgNDAgNCAzOS4xMDQ2IDQgMzhWMTBaIiBmaWxsPSJub25lIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTEwIDE2VjIwIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTE1IDE0VjIyIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTIwIDE2VjIwIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+" alt="会议"></span>':''}</button>`;
   }
