@@ -1,0 +1,48 @@
+/* Scoped changes to the original openJiuwen calendar styles. */
+[hidden]{display:none!important}
+.heroContent_S_QO{max-width:1200px}
+.heroTitle_wXMG{white-space:nowrap}
+.calendarDay_XQwx{font:inherit;text-align:left}
+.calendarDay_XQwx:not(.sig-meeting):hover{background:#eeeeef;border-color:#d9d9df;box-shadow:none;transform:none;color:var(--jiuwen-text-primary)}
+.calendarDay_XQwx:not(.sig-meeting):hover:before{opacity:0}
+.calendarDay_XQwx:not(.sig-meeting):hover .calendarDayNumber_s8Km{color:var(--jiuwen-text-primary)}
+.calendarDay_XQwx.sig-neutral-selected{border-color:#888}
+.sig-meeting .calendarDayEventIcon_Fra5{filter:brightness(0) invert(1)}
+.calendarDayOtherMonth_Z7ER{pointer-events:none}
+.calendarEventHeader_Xb2O{min-height:112px}
+.calendarEventTitle_LmKv{white-space:normal;overflow-wrap:anywhere}
+.calendarEventItemWrapper_DygL{align-self:stretch}
+.calendarEventsList_rOw3{grid-template-rows:repeat(5,minmax(112px,1fr))}
+.calendarEventDetailsDrawerExpanded_A9Qr{max-height:520px}
+.calendarEventDetailRow_NKTC{margin-top:0}
+.calendarEventDetailValue_ILW2{margin:0;min-width:0}
+.calendarEventDetailDescription_ajoU{white-space:normal}
+.sig-agenda{display:block;margin-bottom:6px}
+button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid #7326ff;outline-offset:3px}
+.calendarPaginationBtn_HeU0:disabled{opacity:.4;cursor:not-allowed}
+.communityMenu_FBoF:hover>.dropdownPanel_r8to,.communityMenu_FBoF:focus-within>.dropdownPanel_r8to,.communityMenu_FBoF.sig-menu-open>.dropdownPanel_r8to{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition-delay:0s}
+.communityMenu_FBoF:hover .container_ag2s,.communityMenu_FBoF:focus-within .container_ag2s,.sig-menu-open .container_ag2s{opacity:1;transform:none}
+.sig-mobile-menu{display:none}
+@media(max-width:996px){
+.heroTitle_wXMG{white-space:normal}
+.calendarEventsList_rOw3{display:flex;flex-direction:column;gap:10px}
+.calendarEventItemWrapper_DygL{min-height:112px}
+.calendarEventDetailsDrawer_CS48{position:relative;top:auto;margin-top:4px}
+.calendarEventDetailsDrawerExpanded_A9Qr{max-height:none;overflow:visible}
+.calendarEventHeader_Xb2O{padding-top:14px;padding-bottom:14px}
+.sig-mobile-menu:not([hidden]){display:flex;flex-direction:column;gap:14px;position:fixed;top:72px;left:20px;right:20px;padding:24px;background:white;box-shadow:0 8px 24px #0002;border-radius:12px;z-index:10002}
+}
+@media(max-width:480px){
+.heroTitle_wXMG{font-size:28px;line-height:1.3}
+.calendarEventHeader_Xb2O{flex-wrap:wrap;gap:10px;padding:14px}
+.calendarEventContent_C3Im{flex-basis:calc(100% - 40px)}
+.calendarEventExpandButton_KEF3{margin-left:32px}
+.calendarDay_XQwx{padding:5px}
+.calendarDayEventIcon_Fra5{width:12px;height:12px}
+.calendarDayNumber_s8Km{font-size:12px}
+.calendarEventsHeader_HTTo{gap:8px}
+.calendarTimeRangeSelect_bOzj{max-width:110px}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+.calendarEventDetailsDrawer_CS48{margin:0}
