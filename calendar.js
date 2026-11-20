@@ -5,6 +5,8 @@ const MEETING_DETAILS = {
     date: '2026-12-02',
     time: '下午',
     status: '待开始',
+    meetingId: '95297739',
+    link: 'https://app.huawei.com/wmeeting/join/95297739/LiberOkGjX64BPkxCwmcEVyXPjWurCEpR',
     agenda: [
       '议题一：Agent Solution仓1130版本发布宣讲（付英杰） --- 20min',
       '议题二：智能体特性平台化建设相关内容（陶奕） --- 40min',
