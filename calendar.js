@@ -1,6 +1,18 @@
 'use strict';
-// Calendar snapshot: October 2026. Add confirmed meeting details in this map.
+// Add confirmed meeting details under the month the SIG meeting is for.
 const MEETING_DETAILS = {
+  '2026-11': {
+    date: '2026-12-02',
+    time: '下午',
+    status: '待开始',
+    agenda: [
+      '议题一：Agent Solution仓1130版本发布宣讲（付英杰） --- 20min',
+      '议题二：智能体特性平台化建设相关内容（陶奕） --- 40min',
+      '议题三：Agent Solution新特性解读及demo演示（袁作松） --- 40min',
+      '议题四：智能体平台网关协议及应用（尤国庆） --- 30min',
+      '议题五：开放讨论'
+    ]
+  },
   '2026-10': {
     status: '已结束',
     platform: '线下会议（练秋湖B4-3-18R）& welink线上',
@@ -37,29 +49,44 @@ const MEETING_DETAILS = {
   }
 };
 const MONTH_NAMES = ['一','二','三','四','五','六','七','八','九','十','十一','十二'];
-const SNAPSHOT_DAY = '2026-10-26';
-let year=2026, month=9, range=2, selectedDay=null, page=1, expanded=null;
+const SNAPSHOT_DAY = '2026-11-20';
+let year=2026, month=11, range=2, selectedDay=null, page=1, expanded=null;
 const $ = selector => document.querySelector(selector);
 const pad = n => String(n).padStart(2,'0');
 const escapeHTML = value => String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function lastWednesday(y,m){const last=new Date(Date.UTC(y,m+1,0));return last.getUTCDate()-(last.getUTCDay()-3+7)%7;}
-function getMeeting(y,m){
-  const key=`${y}-${pad(m+1)}`, confirmed=MEETING_DETAILS[key]||{};
-  // Confirmed historical dates take precedence over the recurring schedule.
-  const day=confirmed.day??lastWednesday(y,m),date=`${key}-${pad(day)}`;
-  return {key,year:y,month:m,day,date,title:`openJiuwen Agent Solution ${MONTH_NAMES[m]}月SIG会议`,status:date<SNAPSHOT_DAY?'已结束':'待开始',...confirmed};
+function getMeeting(key){
+  const [meetingYear, meetingMonth] = key.split('-').map(Number);
+  const confirmed = MEETING_DETAILS[key] || {};
+  const date = confirmed.date ?? `${key}-${pad(confirmed.day ?? lastWednesday(meetingYear, meetingMonth-1))}`;
+  const title = `openJiuwen Agent Solution ${MONTH_NAMES[meetingMonth-1]}月SIG会议`;
+  const status = date < SNAPSHOT_DAY ? '已结束' : '待开始';
+  return {key, title, status, ...confirmed, date, day:Number(date.slice(-2))};
+}
+function meetingsInMonth(y,m){
+  const key = `${y}-${pad(m+1)}`;
+  const scheduled = getMeeting(key);
+  const movedIntoMonth = Object.entries(MEETING_DETAILS)
+    .filter(([meetingKey, detail]) => meetingKey !== key && detail.date?.startsWith(`${key}-`))
+    .map(([meetingKey]) => getMeeting(meetingKey));
+  if(scheduled.date.startsWith(`${key}-`)) movedIntoMonth.push(scheduled);
+  return movedIntoMonth.sort((a,b) => a.day-b.day);
 }
 function meetings(){
-  if(selectedDay!==null)return selectedDay===getMeeting(year,month).day?[getMeeting(year,month)]:[];
-  return Array.from({length:range},(_,i)=>{const d=new Date(Date.UTC(year,month-i,1));return getMeeting(d.getUTCFullYear(),d.getUTCMonth());});
+  if(selectedDay!==null)return meetingsInMonth(year,month).filter(event=>event.day===selectedDay);
+  return Array.from({length:range},(_,i)=>{
+    const d=new Date(Date.UTC(year,month-i,1));
+    return meetingsInMonth(d.getUTCFullYear(),d.getUTCMonth());
+  }).flat();
 }
 function renderCalendar(){
   $('#month-title').textContent=`${year}年${month+1}月`;
   const offset=new Date(Date.UTC(year,month,1)).getUTCDay();
+  const monthMeetings=meetingsInMonth(year,month);
   let html=['日','一','二','三','四','五','六'].map(d=>`<div class="calendarWeekday_cbRA">${d}</div>`).join('');
   for(let i=0;i<42;i++){
     const d=new Date(Date.UTC(year,month,1-offset+i));const day=d.getUTCDate(),inside=d.getUTCMonth()===month;
-    const meeting=inside&&day===getMeeting(year,month).day,date=`${year}-${pad(month+1)}-${pad(day)}`;
+    const meeting=inside&&monthMeetings.some(event=>event.day===day),date=`${year}-${pad(month+1)}-${pad(day)}`;
     const classes=['calendarDay_XQwx',!inside?'calendarDayOtherMonth_Z7ER':'',inside&&!meeting&&date<SNAPSHOT_DAY?'calendarDayPast_DjQy':'',meeting?'sig-meeting calendarDayToday_TNxy':'',inside&&day===selectedDay?(meeting?'calendarDaySelected_bq2U':'sig-neutral-selected'):''].filter(Boolean).join(' ');
     html+=`<button type="button" class="${classes}" ${inside?`data-day="${day}"`:'disabled tabindex="-1"'} aria-label="${d.getUTCFullYear()}年${d.getUTCMonth()+1}月${day}日${meeting?'，Solution SIG会议':''}" aria-pressed="${inside&&day===selectedDay}"><span class="calendarDayNumber_s8Km">${day}</span>${meeting?'<span class="calendarDayEvents_cSXP"><img class="calendarDayEventIcon_Fra5" src="assets/metting.svg" alt="会议"></span>':''}</button>`;
   }
@@ -76,7 +103,8 @@ function renderEvents(){
   $('#time-range').hidden=selectedDay!==null;$('#clear-selection').hidden=selectedDay===null;
   $('#events-list').innerHTML=list.length?list.slice((page-1)*5,page*5).map(event=>{
     const open=expanded===event.key,past=event.status==='已结束';
-    return `<article class="calendarEventItemWrapper_DygL"><div class="calendarEventItem_HNM6 ${past?'calendarEventItemPast_Dpdo':''} ${open?'calendarEventItemHasDrawerDown_HDJa':''}"><div class="calendarEventHeader_Xb2O" data-toggle="${event.key}"><img class="calendarEventIcon_Wl69" src="assets/metting.svg" alt="会议"><div class="calendarEventContent_C3Im"><div class="calendarEventDate_LRhf">${event.date}<span class="calendarEventStatusTag__ynt ${past?'calendarEventStatusCompleted_lnRd':'calendarEventStatusUpcoming_q7Ig'}">${event.status}</span></div><div class="calendarEventTitle_LmKv">${escapeHTML(event.title)}</div></div><button type="button" class="calendarEventExpandButton_KEF3" aria-expanded="${open}" aria-controls="details-${event.key}">${open?'收起详情':'展开详情'}</button></div></div><dl id="details-${event.key}" class="calendarEventDetailsDrawer_CS48 ${open?'calendarEventDetailsDrawerExpanded_A9Qr':''}" ${open?'':'hidden'} aria-label="${escapeHTML(event.title)}详情">${details(event)}</dl></article>`;
+    const dateLabel=event.time?`${event.date} ${escapeHTML(event.time)}`:event.date;
+    return `<article class="calendarEventItemWrapper_DygL"><div class="calendarEventItem_HNM6 ${past?'calendarEventItemPast_Dpdo':''} ${open?'calendarEventItemHasDrawerDown_HDJa':''}"><div class="calendarEventHeader_Xb2O" data-toggle="${event.key}"><img class="calendarEventIcon_Wl69" src="assets/metting.svg" alt="会议"><div class="calendarEventContent_C3Im"><div class="calendarEventDate_LRhf">${dateLabel}<span class="calendarEventStatusTag__ynt ${past?'calendarEventStatusCompleted_lnRd':'calendarEventStatusUpcoming_q7Ig'}">${event.status}</span></div><div class="calendarEventTitle_LmKv">${escapeHTML(event.title)}</div></div><button type="button" class="calendarEventExpandButton_KEF3" aria-expanded="${open}" aria-controls="details-${event.key}">${open?'收起详情':'展开详情'}</button></div></div><dl id="details-${event.key}" class="calendarEventDetailsDrawer_CS48 ${open?'calendarEventDetailsDrawerExpanded_A9Qr':''}" ${open?'':'hidden'} aria-label="${escapeHTML(event.title)}详情">${details(event)}</dl></article>`;
   }).join(''):'<div class="calendarNoEvents_E24b">当日暂无会议安排</div>';
   $('#page-info').textContent=`${page} / ${total}`;$('#prev-page').disabled=page===1;$('#next-page').disabled=page===total;
 }
