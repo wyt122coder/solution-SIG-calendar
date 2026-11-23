@@ -1,12 +1,13 @@
 # openJiuwen Agent Solution SIG 日历
 
-[在线查看日历](https://openjiuwen-solution-sig-calendar.wyt122.chatgpt.site)
+- [GitHub Pages 日历（无需 VPN）](https://wyt122coder.github.io/solution-SIG-calendar/)
+- [Sites 日历](https://openjiuwen-solution-sig-calendar.wyt122.chatgpt.site/)
 
 Agent Solution SIG 会议常规安排在每月最后一个周三，已确认的会议按实际日期展示。页面默认显示 2026 年 12 月，支持月份切换、日期筛选、近 1 个月 / 2 个月 / 半年的会议列表，以及会议详情展开。
 
 ## 使用
 
-直接访问上方在线链接，或下载 `sig-calendar.html` 后用浏览器打开。单文件版本内嵌字体、图片、样式和交互，可离线查看。
+直接访问上方任一公开链接，或下载 `sig-calendar.html` 后用浏览器打开。单文件版本内嵌字体、图片、样式和交互，可离线查看。
 
 `index.html`、`calendar.js`、`styles.css` 与 `assets/` 为可编辑源码。修改后执行：
 
@@ -27,7 +28,11 @@ npm run build
 
 ## 托管
 
-源码托管于 [AtomGit](https://atomgit.com/wyt122/solution-SIG-calendar)，网页通过 Sites 发布。AtomGit 推送与 Sites 发布分别执行；源码仓库有新提交时，需要同步发布才能更新在线页面。
+源码同步到 [AtomGit](https://atomgit.com/wyt122/solution-SIG-calendar) 和 [GitHub](https://github.com/wyt122coder/solution-SIG-calendar)。每次更新日历时，将同一版内容发布到两个公开页面。
+
+1. 运行 `npm run check` 和 `npm run build`，将日历源码和生成的 `sig-calendar.html` 一起提交。
+2. 将同一提交推送到 AtomGit 和 GitHub 的 `main` 分支。GitHub Pages 从 GitHub 的 `main` 分支根目录自动发布。
+3. 将该提交构建出的 `dist/` 发布到现有 Sites 项目。两个部署完成后，打开上方两个公开链接，检查更新内容。
 
 `.openai/hosting.json` 记录 Sites 项目和静态产物目录，不含凭据。`dist/` 为构建产物，不纳入源码提交。
 
